@@ -1,0 +1,9 @@
+import nltk
+from nltk.corpus import brown
+words=brown.words()
+l=len(words)
+for i in words:
+         length=lenght+len(i)
+avg=l/length
+print avg
+

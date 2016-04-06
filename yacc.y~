@@ -1,0 +1,81 @@
+%{
+   #include<stdio.h>
+   #include<stdlib.h>
+   #include<unistd.h>
+   #include<string.h>
+   #include<sys/types.h>
+   #include<sys/wait.h>
+   char path[60],arg1[20],arg2[20],command[20],opt[5];
+%}
+%union{
+  char *string;
+  char *a;
+  char *opt;
+  
+}
+%type <string> NARGS ARGS ARG1 LS
+%type <a> ID
+%type <opt> OPT
+
+%token NARGS ARGS ARG1 ID OPT LS
+%%
+S:F {
+        pid_t pid=fork();
+	if(pid==-1)
+    	{
+  		printf("fork Error\n");
+      		exit(0);
+    	}
+  
+    	if(pid==0)
+    	{   
+       		strcpy(path,"/home/samhith/shell/sh/");
+        	strcat(path,command);
+		if(opt!=NULL)
+		{
+			strcat(path,opt);
+		}
+		if(arg1!=NULL)
+		{
+			strcat(path," ");
+			strcat(path,arg1);
+		}
+		if(arg2!=NULL)
+		{
+			strcat(path," ");
+			strcat(path,arg2);
+		} 
+       		system(path);
+		
+		
+	}
+    /* This is the parent process.  Wait for the child to complete.  */
+     wait(0);
+	return 0;
+	
+	
+} 
+F:NARGS{strcpy(command,(char*)$1);}
+ |LS OPT{strcpy(command,(char*)$1);strcpy(opt,(char*)$2);}
+ |ARG1 ID {strcpy(command,(char*)$1);strcpy(arg1,(void*)$2);} 
+ |ARGS ID ID {strcpy(command,(char*)$1);strcpy(arg1,(void*)$2);strcpy(arg2,(void*)$3);};
+ 
+%%
+int yyerror()
+{
+  	printf("Command not found or Wrong Usage\n");
+     	return 0;
+}
+int main(int argc,char* argv[])
+{  
+	
+   	system("clear");
+  	while(1)
+   	{
+		
+ 	   	printf("RSHELL>");	
+		yyparse();
+ 	}     
+return 0;
+}
+
